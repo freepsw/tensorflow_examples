@@ -24,6 +24,6 @@ print tensor_2d
 print tensor_2d[3][3]
 print tensor_2d[0:2,0:2]
 
-tf_tensor=tf.placeholder("float64",tensor_2d,name='x')
-with tf.Session() as sess:
-    print sess.run(x)
+# tf_tensor=tf.placeholder("float64",tensor_2d,name='x')
+# with tf.Session() as sess:
+#     print sess.run(tf_tensor)

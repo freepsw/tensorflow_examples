@@ -5,6 +5,7 @@ https://github.com/PacktPublishing/Getting-Started-with-Tensorflow
 
 ## Code Testing Specifications
 
+>> 
 Software required (With version): 
 Python(2.7)
 TensorFlow(0.7)
@@ -16,7 +17,7 @@ NumPy(1.11.0)
 
 OS required:
 Linux Ubuntu 64 bit
-
+>> 
 
 ##Related TensorFlow Books:
 * [Deep Learning with TensorFlow [Video]](https://www.packtpub.com/big-data-and-business-intelligence/deep-learning-tensorflow-video?utm_source=GitHub&utm_medium=Repository&utm_campaign=9781786464491)

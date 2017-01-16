@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Import MINST data
 import input_data
 mnist = input_data.read_data_sets("/tmp/data/", one_hot=True)
@@ -25,13 +26,12 @@ b = tf.Variable(tf.zeros([10]))
 activation = tf.nn.softmax(tf.matmul(x, W) + b) # Softmax
 
 # Minimize error using cross entropy
+# cross entroy는 실제값을 예측한 2개 이상의 확률분포들 간의 차이를 나타냄
+# 어떤 확률분포가 더 정확한지 판단 (http://laonple.blog.me/220554852626)
 cross_entropy = y*tf.log(activation)
-cost = tf.reduce_mean\
-       (-tf.reduce_sum\
-        (cross_entropy,reduction_indices=1))
+cost = tf.reduce_mean(-tf.reduce_sum(cross_entropy,reduction_indices=1))
 
-optimizer = tf.train.\
-            GradientDescentOptimizer(learning_rate).minimize(cost) 
+optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost)
 
 #Plot settings
 avg_set = []
@@ -50,15 +50,12 @@ with tf.Session() as sess:
         total_batch = int(mnist.train.num_examples/batch_size)
         # Loop over all batches
         for i in range(total_batch):
-            batch_xs, batch_ys = \
-                      mnist.train.next_batch(batch_size)
+            batch_xs, batch_ys = mnist.train.next_batch(batch_size)
             # Fit training using batch data
-            sess.run(optimizer, \
-                     feed_dict={x: batch_xs, y: batch_ys})
+            sess.run(optimizer, feed_dict={x: batch_xs, y: batch_ys})
             # Compute average loss
-            avg_cost += sess.run(cost, \
-                                 feed_dict={x: batch_xs, \
-                                            y: batch_ys})/total_batch
+            avg_cost += sess.run(cost, feed_dict={x: batch_xs, \
+                                                  y: batch_ys})/total_batch
         # Display logs per epoch step
         if epoch % display_step == 0:
             print "Epoch:", '%04d' % (epoch+1), "cost=", "{:.9f}".format(avg_cost)

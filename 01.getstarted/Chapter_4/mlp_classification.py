@@ -1,31 +1,33 @@
-# Import MINST data
+# -*- coding: utf-8 -*-
+#  Import MINST data
 import input_data
 mnist = input_data.read_data_sets("/tmp/data/", one_hot=True)
 
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
-# Parameters
+# 1) Parameters 설정
 learning_rate = 0.001
-training_epochs = 20
-batch_size = 100
+training_epochs = 20 # 반복회수
+batch_size = 100 # 분류할 이미지 수
 display_step = 1
 
-# Network Parameters
+# Network 계층에 필요한 Parameters
+n_input = 784 # MNIST data input (img shape: 28*28)
 n_hidden_1 = 256 # 1st layer num features
 n_hidden_2 = 256 # 2nd layer num features
-n_input = 784 # MNIST data input (img shape: 28*28)
-n_classes = 10 # MNIST total classes (0-9 digits)
+n_classes = 10 # MNIST total classes (0-9 digits) (최종 결과 값 유형 0~9)
 
-# tf Graph input
+# 2) tf Graph input
 x = tf.placeholder("float", [None, n_input])
 y = tf.placeholder("float", [None, n_classes])
 
-#weights layer 1
+# 3) Layer 1 설정
+# weights
 h = tf.Variable(tf.random_normal([n_input, n_hidden_1]))
-#bias layer 1
+# bias
 bias_layer_1 = tf.Variable(tf.random_normal([n_hidden_1]))
-#layer 1
+# sigmoid를 통한 최종 출력을 하는 layer 1 전체 설정
 layer_1 = tf.nn.sigmoid(tf.add(tf.matmul(x,h),bias_layer_1))
 
 #weights layer 2
@@ -39,7 +41,7 @@ layer_2 = tf.nn.sigmoid(tf.add(tf.matmul(layer_1,w),bias_layer_2))
 output = tf.Variable(tf.random_normal([n_hidden_2, n_classes]))
 #biar output layer
 bias_output = tf.Variable(tf.random_normal([n_classes]))
-#output layer
+#output layer (마지막에서는 sigmoid가 아닌 matrix muliply를 실행한다.
 output_layer = tf.matmul(layer_2, output) + bias_output
 
 # cost function

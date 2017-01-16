@@ -1,15 +1,17 @@
-#handling tensors
+
+# handling tensors
 
 
 #STEP 1 --- PREPARE THE DATA
 import matplotlib.image as mp_image
-filename = "packt.jpeg"
+filename = "./packt.jpeg"
 input_image = mp_image.imread(filename)
 
 #dimension
 print 'input dim = {}'.format(input_image.ndim)
 #shape
 print 'input shape = {}'.format(input_image.shape)
+
 
 import matplotlib.pyplot as plt
 plt.imshow(input_image)

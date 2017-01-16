@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -16,17 +18,18 @@ def display_partition(x_values,y_values,assignment_values):
     ax.scatter(df['x'], df['y'], c=df['color'])
     plt.show()
 
+# 1) Data set 정의
 
-num_vectors = 2000
-num_clusters = 4
+num_vectors = 2000 # 클러스터링할 점의 총 개수
+num_clusters = 4 # 클러스터의 갯수
 n_samples_per_cluster = 500
 
-num_steps = 1000
+num_steps = 1000 # KMM 알고리즘 계산 반복 회수
 x_values = []
 y_values = []
 vector_values = []
 
-#CREATE RANDOM DATA
+# 1) CREATE RANDOM DATA
 for i in xrange(num_vectors):
   if np.random.random() > 0.5:
     x_values.append(np.random.normal(0.4, 0.7))
@@ -36,8 +39,9 @@ for i in xrange(num_vectors):
     x_values.append(np.random.normal(0.6, 0.4))
     y_values.append(np.random.normal(0.8, 0.5))
 vector_values = zip(x_values,y_values)
-vectors = tf.constant(vector_values)
+vectors = tf.constant(vector_values) # tensorflow에서 사용가능한 상수로 변환한다.
 
+# 2) k개의 클러스터를 생성하기 위한 초기 중심값 생성(랜덤)
 n_samples = tf.shape(vector_values)[0]
 random_indices = tf.random_shuffle(tf.range(0, n_samples))
 begin = [0,]
@@ -49,14 +53,14 @@ expanded_vectors = tf.expand_dims(vectors, 0)
 expanded_centroids = tf.expand_dims(centroids, 1)
 
 vectors_subtration = tf.sub(expanded_vectors,expanded_centroids)
-euclidean_distances =         
-               \tf.reduce_sum(tf.square(vectors_subtration), 2)
+euclidean_distances = tf.reduce_sum(tf.square(vectors_subtration), 2)
 
 assignments = tf.to_int32(tf.argmin(euclidean_distances, 0))
 
 partitions = [0, 0, 1, 1, 0]
 num_partitions = 2
 data = [10, 20, 30, 40, 50]
+outputs = [1,3]
 outputs[0] = [10, 20, 50]
 outputs[1] = [30, 40]
 partitions = tf.dynamic_partition(vectors, assignments, num_clusters)
