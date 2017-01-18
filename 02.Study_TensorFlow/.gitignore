@@ -1,0 +1,6 @@
+*.png
+*.gz
+!test_2.png
+events.*
+.idea/
+/07 - NN/logs
