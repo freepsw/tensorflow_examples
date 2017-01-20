@@ -1,6 +1,8 @@
+# -*- coding: utf-8 -*-
 import tensorflow as tf
 import numpy as np
 
+# 1) 데이터 정의 (XOR 문제)
 xy = np.loadtxt('07train.txt', unpack=True)
 x_data = np.transpose(xy[0:-1])
 y_data = np.reshape(xy[-1], (4, 1))
@@ -11,6 +13,7 @@ print y_data
 X = tf.placeholder(tf.float32, name='x-input')
 Y = tf.placeholder(tf.float32, name='y-input')
 
+# 2) 가중치 변수 초기
 w1 = tf.Variable(tf.random_uniform([2, 5], -1.0, 1.0), name='weight1')
 w2 = tf.Variable(tf.random_uniform([5, 10], -1.0, 1.0), name='weight2')
 w3 = tf.Variable(tf.random_uniform([10, 10], -1.0, 1.0), name='weight3')
@@ -37,6 +40,7 @@ L6 = tf.nn.relu(tf.matmul(L5, w5) + b5)
 L7 = tf.nn.relu(tf.matmul(L6, w6) + b6)
 L8 = tf.nn.relu(tf.matmul(L7, w7) + b7)
 
+# Deep N 함수 정의
 hypothesis = tf.sigmoid(tf.matmul(L8, w8) + b8)
 
 with tf.name_scope('cost') as scope:

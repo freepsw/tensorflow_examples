@@ -1,10 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Jan 16 16:48:33 2017
-
-@author: skiper
-"""
-
 
 # 이 파일은 https://github.com/tensorflow/tensorflow/blob/r0.9/tensorflow/examples/tutorials/mnist/input_data.py에서 다운로드
 #"""Functions for downloading and reading MNIST data."""
