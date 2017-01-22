@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# [Lab 10] 에서 사용된 소스코드
+# [Lab 10] 에서 사용된 소스코드 (DROP_OUT을 이용한 학습모델)
 import input_data
 import tensorflow as tf
 import random
@@ -42,11 +42,17 @@ b1 = tf.Variable(tf.zeros([500]))
 b2 = tf.Variable(tf.zeros([256]))
 b3 = tf.Variable(tf.zeros([10]))
 
-# 2) Layer간 연결을 통해 최종 model 정의
+# 2) Layer간 연결을 통해 최종 model 정의 (drop out을 이용하여 모델을 학습)
 # Construct model
-L1 = tf.nn.relu(tf.add(tf.matmul(x, W1), b1))
-L2 = tf.nn.relu(tf.add(tf.matmul(L1, W2), b2))
-activation = tf.add(tf.matmul(L2, W3), b3)
+dropout_rate = tf.placeholder("float")
+
+
+_L1 = tf.nn.relu(tf.add(tf.matmul(x, W1), b1))
+L1  = tf.nn.dropout(_L1, dropout_rate)
+_L2 = tf.nn.relu(tf.add(tf.matmul(L1, W2), b2))
+L2  = tf.nn.dropout(_L2, dropout_rate)
+
+activation = tf.add(tf.matmul(L2, W3), b3) # softmax를 사용하지 않는다.
 
 # 3) Minimize error using cross entropy
 #    softmax_cross_entropy_with_logits 함수 : activation 값을 softmax를 통하지 않은 숫자를 사용하는 함수
@@ -84,11 +90,11 @@ with tf.Session() as sess:
         for i in range(total_batch):
             batch_xs, batch_ys = mnist.train.next_batch(batch_size)
             # Fit training using batch data
-            sess.run(optimizer, feed_dict={x: batch_xs, y: batch_ys})
+            sess.run(optimizer, feed_dict={x: batch_xs, y: batch_ys, dropout_rate: 0.7})
             # Compute average loss
 
         # Display logs per epoch step
-        avg_cost += sess.run(cost, feed_dict={x: batch_xs, y: batch_ys}) / total_batch
+        avg_cost += sess.run(cost, feed_dict={x: batch_xs, y: batch_ys, dropout_rate: 0.7}) / total_batch
         if epoch % display_step == 0:
             print ("Epoch:", '%04d' % (epoch + 1), "cost=", "{:.9f}".format(avg_cost))
             print (sess.run(b3))
@@ -100,7 +106,7 @@ with tf.Session() as sess:
 
     # Calculate accuracy
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
-    print ("Accuracy:", accuracy.eval({x: mnist.test.images, y: mnist.test.labels}))
+    print ("Accuracy:", accuracy.eval({x: mnist.test.images, y: mnist.test.labels, dropout_rate: 1}))
 
     save_path = saver.save(sess, checkpoint_dir + 'model.ckpt')
     print("Model saved in file: %s" % save_path)
@@ -112,17 +118,17 @@ with tf.Session() as sess:
     # 5-1) label에는 10개의 값을 가진 vector type이 저장되어 있음 [0, 1, 2, ...., 9] 각각의 확률값이 저장
     #      실제 값은 예를들면 [0.1, 0.5, 0.1 .... 0.0] ==> "1"의 확률값이 가장 높음 (index=1)
     print "Label : ", sess.run(tf.argmax(mnist.test.labels[r:r+1], 1)) # 실제 값을 출력 (정답)
-    print "Predt : ", sess.run(tf.argmax(activation, 1), {x:mnist.test.images[r:r+1]}) # 모델이 예측한 값을 출력
+    print "Predt : ", sess.run(tf.argmax(activation, 1), {x:mnist.test.images[r:r+1], dropout_rate:1}) # 모델이 예측한 값을 출력
     plt.imshow(mnist.test.images[r:r+1].reshape(28, 28), cmap="Greys", interpolation='nearest')
     plt.show()
 
 # 출력 결과
 # total batch :  550
-# ('Epoch:', '0005', 'cost=', '0.000017785')
-# [-0.04423999 -0.58194578  0.55721319 -0.09853368 -0.61277747  0.0913931
-#  -0.98012233  0.00404656  0.80806178  0.12157804]
+# ('Epoch:', '0005', 'cost=', '0.000363186')
+# [-0.01041649 -0.58344501 -0.06178524 -0.38875002  0.0670083   0.22043853
+#  -0.25432891 -0.09421912  0.46506232  0.14277922]
 # Optimization Finished!
-# ('Accuracy:', 0.96939999)
-
-# Label :  [3] <- 정답
-# Predt :  [3] <- 예측한 값
+# ('Accuracy:', 0.95679998)
+# Model saved in file: cps/model.ckpt
+# Label :  [4]
+# Predt :  [4]
