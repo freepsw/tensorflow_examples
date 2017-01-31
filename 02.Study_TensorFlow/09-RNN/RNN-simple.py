@@ -28,6 +28,7 @@ state = tf.zeros([batch_size, rnn_cell.state_size])  # rnn_cell.state_size = 4
 X_split = tf.split(0, time_step_size, x_data)
 outputs, state = tf.nn.rnn(rnn_cell, X_split, state)
 
+
 # 3) cost
 # logits: 예측값, 2차원 배열(,4), (4,4) -> (1, 16) -> (4,4) Tensor객체
 #         list of 2D Tensors of shape [batch_size x num_decoder_symbols]

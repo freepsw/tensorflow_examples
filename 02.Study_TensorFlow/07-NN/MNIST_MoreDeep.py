@@ -9,14 +9,13 @@ def xaver_init(n_inputs, n_outputs, uniform = True):
     if uniform:
         init_range = tf.sqrt(6.0/ (n_inputs + n_outputs))
         return tf.random_uniform_initializer(-init_range, init_range)
-
     else:
         stddev = tf.sqrt(3.0 / (n_inputs + n_outputs))
         return tf.truncated_normal_initializer(stddev=stddev)
 
 # 1) 데이터 및 변수 설정
-learning_rate = 0.01
-training_epochs = 5
+learning_rate = 0.001
+training_epochs = 15
 batch_size = 100
 display_step = 1
 
@@ -34,25 +33,32 @@ y = tf.placeholder("float", [None, 10])  # 0-9 digits recognition => 10 classes
 # tf.get_variable(<name>, <shape>, <initializer>) 는 입력된 이름의 변수를 생성 또는 반환
 #  - tf.Variable을 직접호출 대신 변수를 가져오거나 생성하는 데 사용 (여기서는 변수(W1, W2, W3)를 생성하는데 사용)
 #  - 직접 가지고 오는 대신, 정의된 initializer를 통해 shape를 생성
-W1 = tf.get_variable("W1", shape=[784,500], initializer=xaver_init(784, 500)) # "W1" 변수 생성,
-W2 = tf.get_variable("W2", shape=[500, 256], initializer=xaver_init(500, 256))
-W3 = tf.get_variable("W3", shape=[256, 10], initializer=xaver_init(256, 10))
+W1 = tf.get_variable("W1", shape=[784,256], initializer=xaver_init(784, 256)) # "W1" 변수 생성,
+W2 = tf.get_variable("W2", shape=[256, 256], initializer=xaver_init(256, 256))
+W3 = tf.get_variable("W3", shape=[256, 128], initializer=xaver_init(256, 128))
+W4 = tf.get_variable("W4", shape=[128, 128], initializer=xaver_init(128, 128))
+W5 = tf.get_variable("W5", shape=[128, 10], initializer=xaver_init(128, 10))
 
-b1 = tf.Variable(tf.zeros([500]))
+b1 = tf.Variable(tf.zeros([256]))
 b2 = tf.Variable(tf.zeros([256]))
-b3 = tf.Variable(tf.zeros([10]))
+b3 = tf.Variable(tf.zeros([128]))
+b4 = tf.Variable(tf.zeros([128]))
+b5 = tf.Variable(tf.zeros([10]))
 
 # 2) Layer간 연결을 통해 최종 model 정의 (drop out을 이용하여 모델을 학습)
 # Construct model
 dropout_rate = tf.placeholder("float")
 
-
 _L1 = tf.nn.relu(tf.add(tf.matmul(x, W1), b1))
 L1  = tf.nn.dropout(_L1, dropout_rate)
 _L2 = tf.nn.relu(tf.add(tf.matmul(L1, W2), b2))
 L2  = tf.nn.dropout(_L2, dropout_rate)
+_L3 = tf.nn.relu(tf.add(tf.matmul(L2, W3), b3))
+L3  = tf.nn.dropout(_L3, dropout_rate)
+_L4 = tf.nn.relu(tf.add(tf.matmul(L3, W4), b4))
+L4  = tf.nn.dropout(_L4, dropout_rate)
 
-activation = tf.add(tf.matmul(L2, W3), b3) # softmax를 사용하지 않는다.
+activation = tf.add(tf.matmul(L4, W5), b5) # softmax를 사용하지 않는다.
 
 # 3) Minimize error using cross entropy
 #    softmax_cross_entropy_with_logits 함수 : activation 값을 softmax를 통하지 않은 숫자를 사용하는 함수
@@ -92,13 +98,11 @@ with tf.Session() as sess:
             # Fit training using batch data
             sess.run(optimizer, feed_dict={x: batch_xs, y: batch_ys, dropout_rate: 0.7})
             # Compute average loss
+            avg_cost += sess.run(cost, feed_dict={x: batch_xs, y: batch_ys, dropout_rate: 0.7}) / total_batch
 
         # Display logs per epoch step
-        avg_cost += sess.run(cost, feed_dict={x: batch_xs, y: batch_ys, dropout_rate: 0.7}) / total_batch
         if epoch % display_step == 0:
             print ("Epoch:", '%04d' % (epoch + 1), "cost=", "{:.9f}".format(avg_cost))
-            print (sess.run(b3))
-
     print ("Optimization Finished!")
 
     # Test model
@@ -108,8 +112,8 @@ with tf.Session() as sess:
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
     print ("Accuracy:", accuracy.eval({x: mnist.test.images, y: mnist.test.labels, dropout_rate: 1}))
 
-    save_path = saver.save(sess, checkpoint_dir + 'model.ckpt')
-    print("Model saved in file: %s" % save_path)
+    #save_path = saver.save(sess, checkpoint_dir + 'model.ckpt')
+    #print("Model saved in file: %s" % save_path)
 
 
     # 5) Test 데이터에서 임의로 1개의 이미지를 선택하여, 정답을 예측하는지 확인해보자.

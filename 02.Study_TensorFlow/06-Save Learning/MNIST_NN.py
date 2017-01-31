@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# [Lab 10] 에서 사용된 소스코드
-import input_data
+# [Lab 10] 소스코드
+from tensorflow.examples.tutorials.mnist import input_data
 import tensorflow as tf
 import random
 
@@ -15,8 +15,8 @@ def xaver_init(n_inputs, n_outputs, uniform = True):
         return tf.truncated_normal_initializer(stddev=stddev)
 
 # 1) 데이터 및 변수 설정
-learning_rate = 0.01
-training_epochs = 5
+learning_rate = 0.001
+training_epochs = 15
 batch_size = 100
 display_step = 1
 
@@ -34,16 +34,15 @@ y = tf.placeholder("float", [None, 10])  # 0-9 digits recognition => 10 classes
 # tf.get_variable(<name>, <shape>, <initializer>) 는 입력된 이름의 변수를 생성 또는 반환
 #  - tf.Variable을 직접호출 대신 변수를 가져오거나 생성하는 데 사용 (여기서는 변수(W1, W2, W3)를 생성하는데 사용)
 #  - 직접 가지고 오는 대신, 정의된 initializer를 통해 shape를 생성
-W1 = tf.get_variable("W1", shape=[784,500], initializer=xaver_init(784, 500)) # "W1" 변수 생성,
-W2 = tf.get_variable("W2", shape=[500, 256], initializer=xaver_init(500, 256))
+W1 = tf.get_variable("W1", shape=[784,256], initializer=xaver_init(784, 256)) # "W1" 변수 생성,
+W2 = tf.get_variable("W2", shape=[256, 256], initializer=xaver_init(256, 256))
 W3 = tf.get_variable("W3", shape=[256, 10], initializer=xaver_init(256, 10))
 
-b1 = tf.Variable(tf.zeros([500]))
+b1 = tf.Variable(tf.zeros([256]))
 b2 = tf.Variable(tf.zeros([256]))
 b3 = tf.Variable(tf.zeros([10]))
 
 # 2) Layer간 연결을 통해 최종 model 정의
-# Construct model
 L1 = tf.nn.relu(tf.add(tf.matmul(x, W1), b1))
 L2 = tf.nn.relu(tf.add(tf.matmul(L1, W2), b2))
 activation = tf.add(tf.matmul(L2, W3), b3)
@@ -85,26 +84,22 @@ with tf.Session() as sess:
             batch_xs, batch_ys = mnist.train.next_batch(batch_size)
             # Fit training using batch data
             sess.run(optimizer, feed_dict={x: batch_xs, y: batch_ys})
-            # Compute average loss
+            # Compute average loss & Display logs per epoch step
+            avg_cost += sess.run(cost, feed_dict={x: batch_xs, y: batch_ys}) / total_batch
 
-        # Display logs per epoch step
-        avg_cost += sess.run(cost, feed_dict={x: batch_xs, y: batch_ys}) / total_batch
         if epoch % display_step == 0:
             print ("Epoch:", '%04d' % (epoch + 1), "cost=", "{:.9f}".format(avg_cost))
-            print (sess.run(b3))
 
     print ("Optimization Finished!")
 
     # Test model
     correct_prediction = tf.equal(tf.argmax(activation, 1), tf.argmax(y, 1))
-
     # Calculate accuracy
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
     print ("Accuracy:", accuracy.eval({x: mnist.test.images, y: mnist.test.labels}))
 
     save_path = saver.save(sess, checkpoint_dir + 'model.ckpt')
     print("Model saved in file: %s" % save_path)
-
 
     # 5) Test 데이터에서 임의로 1개의 이미지를 선택하여, 정답을 예측하는지 확인해보자.
     import matplotlib.pyplot as plt
