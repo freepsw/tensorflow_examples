@@ -3,8 +3,6 @@ import gym
 from gym.envs.registration import register
 import sys, tty, termios
 
-
-
 class _Getch:
     def __call__(self):
         fd = sys.stdin.fileno()
