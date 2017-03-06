@@ -12,6 +12,3 @@
  > pip install gym
  > pip install gym[atari]
 ```
-
-# Source list
- - Lab2.py : https://www.youtube.com/watch?v=xvDAURQVDhk&t=1s
