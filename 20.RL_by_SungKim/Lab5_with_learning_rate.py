@@ -2,6 +2,7 @@ import gym
 from gym.envs.registration import register
 import numpy as np
 import random as pr
+
 import matplotlib.pyplot as plt
 
 env = gym.make('FrozenLake-v0')
